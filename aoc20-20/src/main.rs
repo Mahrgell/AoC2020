@@ -78,67 +78,27 @@ fn add_edge(tile_id: u32, edge: &[bool; 10], edges: &mut HashMap<u32, Vec<u32>>)
     }
     id
 }
-// check if there is a given nessie at the given position. For some reason the position is offset by 1,1!
+// check if there is a given nessie at the given position.
 // strike out all tiles, if they are part of a nessie
 fn check_nessie(pic: &[[bool; 96]; 96], not_nessie: & mut [[bool; 96]; 96], x: usize, y: usize, horizontal: bool, nessie: &[[bool;20];3]) -> bool {
-    if horizontal && y+19 >= pic[0].len() {
+    if horizontal && y+20 >= pic[0].len() {
         return false;
     }
-    else if !horizontal && x+19 >= pic.len() {
+    else if !horizontal && x+20 >= pic.len() {
         return false;
     }
-    let mut p0x = x-1;
-    let mut p0y = y-1;
-    let mut p1x = if horizontal {x} else {x-1};
-    let mut p1y = if horizontal {y-1} else {y};
-    let mut p2x = if horizontal {x+1} else {x-1};
-    let mut p2y = if horizontal {y-1} else {y+1};
     for i in 0..20 {
-        if nessie[0][i] && !pic[p0x][p0y]{
-            return false;
-        }
-        if nessie[1][i] && !pic[p1x][p1y]{
-            return false;
-        }
-        if nessie[2][i] && !pic[p2x][p2y]{
-            return false;
-        }
-        if horizontal {
-            p0y += 1;
-            p1y += 1;
-            p2y += 1;
-        }
-        else {
-            p0x += 1;
-            p1x += 1;
-            p2x += 1;
+        for j in 0..3 {
+            if nessie[j][i] && !pic[if horizontal {x+j} else {x+i}][if horizontal {y+i} else {y+j}]{
+                return false;
+            }
         }
     }
-    let mut p0x = x-1;
-    let mut p0y = y-1;
-    let mut p1x = if horizontal {x} else {x-1};
-    let mut p1y = if horizontal {y-1} else {y};
-    let mut p2x = if horizontal {x+1} else {x-1};
-    let mut p2y = if horizontal {y-1} else {y+1};
     for i in 0..20 {
-        if nessie[0][i] {
-            not_nessie[p0x][p0y] = false;
-        }
-        if nessie[1][i] {
-            not_nessie[p1x][p1y] = false;
-        }
-        if nessie[2][i] {
-            not_nessie[p2x][p2y] = false;
-        }
-        if horizontal {
-            p0y += 1;
-            p1y += 1;
-            p2y += 1;
-        }
-        else {
-            p0x += 1;
-            p1x += 1;
-            p2x += 1;
+        for j in 0..3 {
+            if nessie[j][i]{
+                not_nessie[if horizontal {x+j} else {x+i}][if horizontal {y+i} else {y+j}] = false;
+            }
         }
     }
     println!("NESSIE found, starting at {},{} - Horizontal: {}", x,y,horizontal);
@@ -299,8 +259,8 @@ fn main() {
     // points which are not part of nessie
     let mut not_part_of_nessie = picture;
     // strike out all nessies!
-    for x in 1..picture.len()-1 {
-        for y in 1..picture[0].len()-1 {
+    for x in 0..picture.len()-2 {
+        for y in 0..picture[0].len()-2 {
             for n in &nessies {
                 check_nessie(&picture, & mut not_part_of_nessie, x, y, true, n);
                 check_nessie(&picture, & mut not_part_of_nessie, x, y, false, n);
